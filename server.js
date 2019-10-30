@@ -11,9 +11,21 @@ function methodUrlLogger(req, res, next) {
   next();
 }
 
+function gateKeeper(req, res, next) {
+  const password = req.headers.password || "";
+  if (password.toLowerCase() === "mellon") {
+    next();
+  } else if (!req.headers.password) {
+    res.status(400).json({ message: "Please provide a password" });
+  } else {
+    res.status(401).json({ message: "You shall not pass" });
+  }
+}
+
 server.use(helmet());
 server.use(express.json());
 server.use(methodUrlLogger);
+server.use(gateKeeper);
 
 server.use("/api/hubs", hubsRouter);
 
